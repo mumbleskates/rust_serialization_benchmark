@@ -1,4 +1,4 @@
-const _: () = ::protobuf::__internal::assert_compatible_gencode_version("4.35.1-release");
+const _: () = ::protobuf::__internal::assert_compatible_gencode_version("0.36.1-release");
 // This variable must not be referenced except by protobuf generated
 // code.
 pub(crate) static mut prost__mk48__Vector2f_msg_init: ::protobuf::__internal::runtime::MiniTableInitPtr =
