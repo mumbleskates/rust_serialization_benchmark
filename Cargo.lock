@@ -2656,7 +2656,7 @@ dependencies = [
  "serde",
  "serde-zap",
  "serde_json",
- "simd-json 0.18.1",
+ "simd-json",
  "simd-json-derive",
  "wincode",
  "zerompk",
@@ -2877,20 +2877,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "simd-json"
-version = "0.18.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6ebe141eb4a23ecc4d5de93fa5b139ac65dc07c38037a2fe9a8fb7c9d36bd832"
-dependencies = [
- "halfbrown",
- "ref-cast",
- "serde",
- "serde_json",
- "simdutf8",
- "value-trait",
-]
-
-[[package]]
 name = "simd-json-derive"
 version = "0.18.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2899,7 +2885,7 @@ dependencies = [
  "chrono",
  "itoa",
  "ryu",
- "simd-json 0.17.3",
+ "simd-json",
  "simd-json-derive-int",
  "thiserror 2.0.20",
  "value-trait",
@@ -2913,7 +2899,7 @@ checksum = "e60b40db276e0d588874b1317a1603e0795ef38889e09111d841a9845623efd0"
 dependencies = [
  "proc-macro2",
  "quote",
- "simd-json 0.17.3",
+ "simd-json",
  "syn 2.0.119",
  "thiserror 2.0.20",
 ]

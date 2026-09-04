@@ -82,7 +82,8 @@ serde_json = { version = "=1.0.151", features = [
     "float_roundtrip",
 ], optional = true }
 serde-zap = { version = "=0.1.1", optional = true }
-simd-json = { version = "=0.18.1", optional = true }
+# cannot upgrade simd-json: https://github.com/simd-lite/simd-json-derive/issues/100
+simd-json = { version = "=0.17.3", optional = true }
 simd-json-derive = { version = "=0.18.0", optional = true }
 wincode = { version = "=0.6.1", optional = true, features = ["derive"] }
 zerompk = { version = "=0.8.0", optional = true, features = ["derive"] }
@@ -152,7 +153,7 @@ regenerate = [
     "regenerate-protobuf4",
 ]
 regenerate-buffa = ["dep:buffa-build"]
-regenerate-capnp = ["dep:capnpc"]
+regenerate-capnp = ["dep:capnpc", "dep:capnp"]
 regenerate-flatbuffers = ["dep:flatc-rust"]
 regenerate-prost = ["dep:prost-build"]
 regenerate-protobuf = ["dep:protobuf-codegen"]
@@ -163,6 +164,7 @@ rand_pcg = "0.3.1"
 
 [build-dependencies]
 buffa-build = { version = "=0.9.2", optional = true }
+capnp = "=0.27.0"
 capnpc = { version = "=0.27.0", optional = true }
 flatc-rust = { version = "=0.2.0", optional = true }
 prost-build = { version = "=0.14.4", optional = true }
