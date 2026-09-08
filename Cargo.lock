@@ -2629,6 +2629,7 @@ dependencies = [
  "cbor4ii",
  "ciborium",
  "criterion",
+ "eyre",
  "flatbuffers",
  "flatc-rust",
  "flexbuffers",
