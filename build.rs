@@ -1,22 +1,24 @@
-#[allow(unused_imports)]
+#![allow(unused_imports)]
+use eyre::{eyre as err, Result};
 use std::{
     env,
     path::{Path, PathBuf},
 };
 
 #[cfg(feature = "regenerate-capnp")]
-fn capnpc_compile_dataset(name: &'static str) -> capnp::Result<()> {
+fn capnpc_compile_dataset(name: &'static str) -> Result<()> {
     let mut command = capnpc::CompilerCommand::new();
     #[cfg(windows)]
     command.capnp_executable("prebuilt/capnp.exe");
     command.file(format!("src/datasets/{0}/{0}.capnp", name));
     command.output_path(".");
     command.default_parent_module(vec!["datasets".into(), name.into()]);
-    command.run()
+    command.run()?;
+    Ok(())
 }
 
 #[cfg(feature = "regenerate-flatbuffers")]
-fn flatc_compile_dataset(name: &'static str) -> flatc_rust::Result<()> {
+fn flatc_compile_dataset(name: &'static str) -> Result<()> {
     #[cfg(windows)]
     let flatc = flatc_rust::Flatc::from_path("./prebuilt/flatc.exe");
     #[cfg(not(windows))]
@@ -28,11 +30,12 @@ fn flatc_compile_dataset(name: &'static str) -> flatc_rust::Result<()> {
         out_dir: Path::new(&format!("./src/datasets/{}", name)),
         extra: &["--gen-onefile"],
         ..Default::default()
-    })
+    })?;
+    Ok(())
 }
 
 #[cfg(feature = "regenerate-buffa")]
-fn buffa_compile_dataset(name: &'static str) {
+fn buffa_compile_dataset(name: &'static str) -> Result<()> {
     if cfg!(windows) && env::var("PROTOC").is_err() {
         env::set_var("PROTOC", "./prebuilt/protoc.exe");
     }
@@ -42,11 +45,12 @@ fn buffa_compile_dataset(name: &'static str) {
         .out_dir(format!("./src/datasets/{name}/{name}_buffa"))
         .include_file("mod.rs")
         .compile()
-        .unwrap();
+        .map_err(|err| err!("{err}"))?;
+    Ok(())
 }
 
 #[cfg(feature = "regenerate-prost")]
-fn prost_compile_dataset(name: &'static str) -> std::io::Result<()> {
+fn prost_compile_dataset(name: &'static str) -> Result<()> {
     if cfg!(windows) && env::var("PROTOC").is_err() {
         env::set_var("PROTOC", "./prebuilt/protoc.exe");
     }
@@ -56,11 +60,12 @@ fn prost_compile_dataset(name: &'static str) -> std::io::Result<()> {
     prost_config.compile_protos(
         &[format!("./src/datasets/{name}/{name}.proto").as_str()],
         &["src"],
-    )
+    )?;
+    Ok(())
 }
 
 #[cfg(feature = "regenerate-protobuf")]
-fn protobuf_compile_dataset(name: &'static str) -> std::io::Result<()> {
+fn protobuf_compile_dataset(name: &'static str) -> Result<()> {
     if cfg!(windows) && env::var("PROTOC").is_err() {
         env::set_var("PROTOC", "./prebuilt/protoc.exe");
     }
@@ -71,13 +76,12 @@ fn protobuf_compile_dataset(name: &'static str) -> std::io::Result<()> {
         .inputs(&[format!("./src/datasets/{name}/{name}.proto")])
         .include(format!("./src/datasets/{name}/"))
         .run()
-        .unwrap();
-
+        .map_err(|err| err!(err.into_boxed_dyn_error()))?;
     Ok(())
 }
 
 #[cfg(feature = "regenerate-protobuf4")]
-fn protobuf4_compile_dataset(name: &'static str) -> std::io::Result<()> {
+fn protobuf4_compile_dataset(name: &'static str) -> Result<()> {
     if cfg!(windows) && env::var("PROTOC").is_err() {
         env::set_var("PROTOC", "./prebuilt/protoc.exe");
     }
@@ -86,12 +90,11 @@ fn protobuf4_compile_dataset(name: &'static str) -> std::io::Result<()> {
         .inputs([format!("{name}.proto")])
         .output_dir(format!("./protobuf4-generated/src/{name}"))
         .generate_and_compile()
-        .unwrap();
-
+        .map_err(eyre::Report::msg)?;
     Ok(())
 }
 
-fn main() {
+fn main() -> Result<()> {
     #[cfg(any(
         feature = "regenerate-buffa",
         feature = "regenerate-capnp",
@@ -104,17 +107,18 @@ fn main() {
         const DATASETS: &[&str] = &["log", "mesh", "minecraft_savedata", "mk48"];
         for &name in DATASETS.iter() {
             #[cfg(feature = "regenerate-buffa")]
-            buffa_compile_dataset(name);
+            buffa_compile_dataset(name)?;
             #[cfg(feature = "regenerate-capnp")]
-            capnpc_compile_dataset(name).unwrap();
+            capnpc_compile_dataset(name)?;
             #[cfg(feature = "regenerate-flatbuffers")]
-            flatc_compile_dataset(name).unwrap();
+            flatc_compile_dataset(name)?;
             #[cfg(feature = "regenerate-prost")]
-            prost_compile_dataset(name).unwrap();
+            prost_compile_dataset(name)?;
             #[cfg(feature = "regenerate-protobuf")]
-            protobuf_compile_dataset(name).unwrap();
+            protobuf_compile_dataset(name)?;
             #[cfg(feature = "regenerate-protobuf4")]
-            protobuf4_compile_dataset(name).unwrap();
+            protobuf4_compile_dataset(name)?;
         }
     }
+    Ok(())
 }
